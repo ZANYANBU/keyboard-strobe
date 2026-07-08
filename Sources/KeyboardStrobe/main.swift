@@ -37,8 +37,8 @@ class AudioProcessor: NSObject, SCStreamOutput {
     var lastDetectedTime = Date()
     
     // Timing parameters to handle MacBook hardware LED latency
-    let holdOnDuration: TimeInterval = 0.08
-    let refractoryPeriod: TimeInterval = 0.11
+    let holdOnDuration: TimeInterval = 0.09
+    let refractoryPeriod: TimeInterval = 0.20
     
     // Delay queue for perfect audio sync calibration
     struct BeatEvent {
