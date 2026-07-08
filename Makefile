@@ -14,6 +14,7 @@ app: $(SWIFT_FILES) $(INFOPLIST)
 	@mkdir -p $(MACOS_DIR)
 	@mkdir -p $(RESOURCES_DIR)
 	@cp $(INFOPLIST) $(APP_DIR)/Contents/Info.plist
+	@cp AppIcon.icns $(RESOURCES_DIR)/AppIcon.icns
 	swiftc -O -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker $(INFOPLIST) $(SWIFT_FILES) -o $(BINARY_NAME)
 	@echo "Build successful! You can now run $(APP_DIR)"
 

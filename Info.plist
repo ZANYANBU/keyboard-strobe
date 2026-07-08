@@ -6,6 +6,8 @@
     <string>com.zanyanbu.keyboardstrobe</string>
     <key>CFBundleName</key>
     <string>Keyboard Strobe</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleExecutable</key>
     <string>KeyboardStrobe</string>
     <key>CFBundlePackageType</key>
