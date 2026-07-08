@@ -1,8 +1,22 @@
 # 🎹 Keyboard Strobe
 
+<div align="center">
+  <img src="demos/demo.gif" width="320" alt="Keyboard Strobe Demo">
+</div>
+
 > **Turn your MacBook's keyboard backlight into a zero-latency, beat-synced strobe light!**
 
 `keyboard-strobe` is a high-performance command-line utility for macOS that captures direct system audio and flashes your MacBook keyboard's backlight in perfect sync with the beats of your music. It is built in native Swift and leverages Apple's **ScreenCaptureKit** to stream internal mixer audio directly—bypassing the microphone entirely and ignoring ambient room noise.
+
+---
+
+## 🎥 Demos
+
+*Click to play the demo clips below:*
+
+https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo1.mp4
+
+https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo2.mp4
 
 ---
 
