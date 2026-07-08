@@ -179,7 +179,7 @@ func printHelp() {
       --snare-only   Pulse only to mid-high frequencies like snare drum and claps.
       --delay <ms>   Delay the light flashes by <ms> milliseconds to perfectly sync with
                      audio latency (e.g. Bluetooth speakers, AirPods, or built-in system buffer).
-                     Default is 80 (80ms).
+                     Default is 120 (120ms).
       --help         Display this help message.
       
     By default, keyboard-strobe monitors both bass and snare bands for optimal beat matching.
@@ -200,7 +200,7 @@ func main() {
         mode = .snare
     }
     
-    var delayMs: Double = 80.0
+    var delayMs: Double = 120.0
     if let delayIndex = args.firstIndex(of: "--delay"), delayIndex + 1 < args.count {
         if let customDelay = Double(args[delayIndex + 1]) {
             delayMs = customDelay
