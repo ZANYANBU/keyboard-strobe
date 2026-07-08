@@ -23,10 +23,10 @@ class AudioProcessor: NSObject, SCStreamOutput {
     let initialBrightness: Float
     let initialAutoBrightness: Bool
     
-    // Low-Pass Filter state to isolate bass (cutoff fc ≈ 120 Hz)
+    // Low-Pass Filter state to isolate bass frequencies (fc ≈ 120 Hz)
     var lpfBassLast: Float = 0.0
     
-    // High-Pass Filter state to isolate snare/mid-high transients (cutoff fc ≈ 1200 Hz)
+    // High-Pass Filter state to isolate snare/mid-high transients (fc ≈ 1200 Hz)
     var lpfSnareLast: Float = 0.0
     
     // Onset Detection Histories (last ~500ms)
@@ -34,12 +34,19 @@ class AudioProcessor: NSObject, SCStreamOutput {
     var snareHistory = [Float]()
     let historySize = 25
     
-    var isLightOn: Bool = false
-    var lastTriggerTime = Date()
+    var lastDetectedTime = Date()
     
     // Timing parameters to handle MacBook hardware LED latency
     let holdOnDuration: TimeInterval = 0.06
     let refractoryPeriod: TimeInterval = 0.08
+    
+    // Delay queue for perfect audio sync calibration
+    struct BeatEvent {
+        let triggerTime: Date
+        let turnOffTime: Date
+    }
+    var beatQueue = [BeatEvent]()
+    let delayDuration: TimeInterval // Configurable delay in seconds
     
     // Mode settings
     let mode: VisualizerMode
@@ -50,12 +57,13 @@ class AudioProcessor: NSObject, SCStreamOutput {
         case snare // Flash only on Snare hits/claps
     }
     
-    init(client: AnyObject, keyboardID: UInt64, initialBrightness: Float, initialAutoBrightness: Bool, mode: VisualizerMode) {
+    init(client: AnyObject, keyboardID: UInt64, initialBrightness: Float, initialAutoBrightness: Bool, mode: VisualizerMode, delayMs: Double) {
         self.client = client
         self.keyboardID = keyboardID
         self.initialBrightness = initialBrightness
         self.initialAutoBrightness = initialAutoBrightness
         self.mode = mode
+        self.delayDuration = delayMs / 1000.0
         super.init()
     }
     
@@ -116,7 +124,6 @@ class AudioProcessor: NSObject, SCStreamOutput {
             
             // Onset triggers
             let now = Date()
-            let timeSinceTrigger = now.timeIntervalSince(lastTriggerTime)
             
             var isBeatDetected = false
             
@@ -132,21 +139,20 @@ class AudioProcessor: NSObject, SCStreamOutput {
                 isBeatDetected = hasSnareOnset
             }
             
-            if timeSinceTrigger >= refractoryPeriod {
-                if isBeatDetected {
-                    isLightOn = true
-                    lastTriggerTime = now
-                } else {
-                    if isLightOn && timeSinceTrigger >= holdOnDuration {
-                        isLightOn = false
-                        lastTriggerTime = now
-                    }
-                }
-            } else {
-                if isLightOn && timeSinceTrigger >= holdOnDuration {
-                    isLightOn = false
-                }
+            // If a beat is detected outside the refractory period, queue a future trigger
+            if isBeatDetected && now.timeIntervalSince(lastDetectedTime) >= refractoryPeriod {
+                lastDetectedTime = now
+                
+                let triggerTime = now.addingTimeInterval(delayDuration)
+                let turnOffTime = triggerTime.addingTimeInterval(holdOnDuration)
+                beatQueue.append(BeatEvent(triggerTime: triggerTime, turnOffTime: turnOffTime))
             }
+            
+            // Filter out old/expired beat events
+            beatQueue = beatQueue.filter { $0.turnOffTime > now }
+            
+            // Check if we are currently inside any active beat's trigger window
+            let isLightOn = beatQueue.contains(where: { now >= $0.triggerTime && now <= $0.turnOffTime })
             
             let targetBrightness: Float = isLightOn ? 1.0 : 0.0
             _ = client.setBrightness?(targetBrightness, forKeyboard: keyboardID)
@@ -155,7 +161,8 @@ class AudioProcessor: NSObject, SCStreamOutput {
             let bar = (targetBrightness == 1.0) ? "████████████████████" : "░░░░░░░░░░░░░░░░░░░░"
             let stateName = (targetBrightness == 1.0) ? "ON " : "OFF"
             let modeName = String(describing: mode).uppercased()
-            print("\rMode: \(modeName) | Beat: \(stateName) | [\(bar)] (Bass: \(String(format: "%.4f", bassRms)) | Snare: \(String(format: "%.4f", snareRms)))", terminator: "")
+            let delayStr = String(format: "%.0fms", delayDuration * 1000.0)
+            print("\rMode: \(modeName) | Delay: \(delayStr) | Beat: \(stateName) | [\(bar)] (Bass: \(String(format: "%.4f", bassRms)) | Snare: \(String(format: "%.4f", snareRms)))", terminator: "")
             fflush(stdout)
         }
     }
@@ -170,6 +177,9 @@ func printHelp() {
     Options:
       --bass-only    Pulse only to bass kick drums (heavy rhythm).
       --snare-only   Pulse only to mid-high frequencies like snare drum and claps.
+      --delay <ms>   Delay the light flashes by <ms> milliseconds to perfectly sync with
+                     audio latency (e.g. Bluetooth speakers, AirPods, or built-in system buffer).
+                     Default is 80 (80ms).
       --help         Display this help message.
       
     By default, keyboard-strobe monitors both bass and snare bands for optimal beat matching.
@@ -188,6 +198,13 @@ func main() {
         mode = .bass
     } else if args.contains("--snare-only") {
         mode = .snare
+    }
+    
+    var delayMs: Double = 80.0
+    if let delayIndex = args.firstIndex(of: "--delay"), delayIndex + 1 < args.count {
+        if let customDelay = Double(args[delayIndex + 1]) {
+            delayMs = customDelay
+        }
     }
     
     let path = "/System/Library/PrivateFrameworks/CoreBrightness.framework/CoreBrightness"
@@ -253,7 +270,7 @@ func main() {
     let streamDelegate = StreamDelegate()
     let stream = SCStream(filter: filter, configuration: config, delegate: streamDelegate)
     
-    let processor = AudioProcessor(client: client, keyboardID: keyboardID, initialBrightness: initialBrightness, initialAutoBrightness: initialAutoBrightness, mode: mode)
+    let processor = AudioProcessor(client: client, keyboardID: keyboardID, initialBrightness: initialBrightness, initialAutoBrightness: initialAutoBrightness, mode: mode, delayMs: delayMs)
     
     do {
         try stream.addStreamOutput(processor, type: .audio, sampleHandlerQueue: DispatchQueue.global(qos: .userInitiated))
@@ -283,7 +300,7 @@ func main() {
     print("Status: Running.")
     print("Source: Direct Internal macOS Audio Output (No mic).")
     print("Detection: Dual-band (Kick LPF 120Hz + Snare HPF 1200Hz).")
-    print("Timing: Zero-latency callback updates (~21ms buffer cycles).")
+    print("Timing: Calibrated delay of \(Int(delayMs))ms (use --delay to adjust).")
     print("To stop: Press Ctrl+C in this terminal window.")
     print("====================================================\n")
     
