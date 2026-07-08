@@ -1,0 +1,10 @@
+# Executables
+keyboard-strobe
+
+# Xcode & Swift Build Files
+.build/
+*.xcodeproj/
+DerivedData/
+
+# OS Files
+.DS_Store

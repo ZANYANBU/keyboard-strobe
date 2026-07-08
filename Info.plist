@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.zanyanbu.keyboardstrobe</string>
+    <key>CFBundleName</key>
+    <string>keyboard-strobe</string>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>This tool needs to capture system audio to synchronize your keyboard backlight brightness with your music.</string>
+</dict>
+</plist>
