@@ -35,49 +35,25 @@ https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo2.mp4
 
 ## 🚀 Installation
 
-### Prerequisites
-- macOS Ventura (13.0) or later.
-- Swift compiler (`swiftc` - pre-installed with Xcode Command Line Tools).
+### 1. Download
+Download the latest `KeyboardStrobe.zip` from the repository.
 
-### Easy Install (via Git & Make)
+### 2. Install
+Unzip the file and drag **KeyboardStrobe.app** to your `Applications` folder.
 
-Clone the repository and compile the utility locally:
-
-```bash
-git clone https://github.com/ZANYANBU/keyboard-strobe.git
-cd keyboard-strobe
-make
-sudo make install
-```
-
-This compiles the project and copies the executable directly to `/usr/local/bin/keyboard-strobe`.
+---
 
 ---
 
 ## 🛠️ Usage
 
-Simply run:
-```bash
-keyboard-strobe
-```
-
-### Options
-You can configure `keyboard-strobe` to track specific frequencies depending on your music:
-
-- **⚡ Dual Mode (Default):** Flashes on both kick drums (bass) and snare hits/claps (treble). Great for all round music.
-  ```bash
-  keyboard-strobe
-  ```
-- **🥁 Bass-Only Mode:** Isolates the heavy kick drums and low sub-frequencies. Perfect for EDM, Techno, or House.
-  ```bash
-  keyboard-strobe --bass-only
-  ```
-- **👏 Snare-Only Mode:** Focuses on high-frequency hits like claps and hi-hats.
-  ```bash
-  keyboard-strobe --snare-only
-  ```
-
-To stop the visualizer and automatically restore your original keyboard brightness settings, press **`Ctrl + C`**.
+1. Double click **KeyboardStrobe.app** to launch it.
+2. A new waveform icon will appear in your macOS menu bar at the top right of your screen.
+3. Click the icon to open the dropdown menu, where you can:
+   - **Start / Stop** the strobe visualizer.
+   - **Change Mode:** Select between Dual (default), Bass Only, or Snare Only.
+   - **Adjust Audio Delay:** Select an audio delay to compensate for Bluetooth speaker latency (default is 120ms).
+   - **Quit** the app cleanly.
 
 ---
 

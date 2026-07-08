@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import ScreenCaptureKit
 import AVFoundation
@@ -157,170 +158,164 @@ class AudioProcessor: NSObject, SCStreamOutput {
             let targetBrightness: Float = isLightOn ? 1.0 : 0.0
             _ = client.setBrightness?(targetBrightness, forKeyboard: keyboardID)
             
-            // Terminal visualizer feedback
-            let bar = (targetBrightness == 1.0) ? "████████████████████" : "░░░░░░░░░░░░░░░░░░░░"
-            let stateName = (targetBrightness == 1.0) ? "ON " : "OFF"
-            let modeName = String(describing: mode).uppercased()
-            let delayStr = String(format: "%.0fms", delayDuration * 1000.0)
-            print("\rMode: \(modeName) | Delay: \(delayStr) | Beat: \(stateName) | [\(bar)] (Bass: \(String(format: "%.4f", bassRms)) | Snare: \(String(format: "%.4f", snareRms)))", terminator: "")
-            fflush(stdout)
         }
     }
 }
 
-func printHelp() {
-    print("""
-    Keyboard Strobe - macOS Keyboard Audio Visualizer
+class AppDelegate: NSObject, NSApplicationDelegate {
+    var statusItem: NSStatusItem!
     
-    Usage: keyboard-strobe [options]
+    // Audio engine components
+    var stream: SCStream?
+    var processor: AudioProcessor?
+    let client: AnyObject
+    let keyboardID: UInt64
+    let initialBrightness: Float
+    let initialAutoBrightness: Bool
     
-    Options:
-      --bass-only    Pulse only to bass kick drums (heavy rhythm).
-      --snare-only   Pulse only to mid-high frequencies like snare drum and claps.
-      --delay <ms>   Delay the light flashes by <ms> milliseconds to perfectly sync with
-                     audio latency (e.g. Bluetooth speakers, AirPods, or built-in system buffer).
-                     Default is 120 (120ms).
-      --help         Display this help message.
-      
-    By default, keyboard-strobe monitors both bass and snare bands for optimal beat matching.
-    """)
-}
-
-func main() {
-    let args = CommandLine.arguments
-    if args.contains("--help") || args.contains("-h") {
-        printHelp()
-        return
+    // State
+    var currentMode: AudioProcessor.VisualizerMode = .dual
+    var currentDelayMs: Double = 120.0
+    var isRunning = false
+    
+    // UI elements to update state
+    var startStopMenuItem: NSMenuItem!
+    
+    override init() {
+        let path = "/System/Library/PrivateFrameworks/CoreBrightness.framework/CoreBrightness"
+        guard let handle = dlopen(path, RTLD_NOW) else {
+            fatalError("Failed to load CoreBrightness framework.")
+        }
+        
+        guard let clientClass = NSClassFromString("KeyboardBrightnessClient") as? NSObject.Type else {
+            fatalError("Could not locate class 'KeyboardBrightnessClient'.")
+        }
+        
+        let clientInstance = clientClass.init()
+        self.client = clientInstance as AnyObject
+        
+        guard let ids = client.copyKeyboardBacklightIDs?(), ids.count > 0,
+              let kid = (ids[0] as AnyObject).uint64Value else {
+            fatalError("No keyboard backlights detected.")
+        }
+        
+        self.keyboardID = kid
+        self.initialBrightness = client.brightnessForKeyboard?(kid) ?? 0.5
+        self.initialAutoBrightness = client.isAutoBrightnessEnabledForKeyboard?(kid) ?? false
+        
+        super.init()
     }
     
-    var mode = AudioProcessor.VisualizerMode.dual
-    if args.contains("--bass-only") {
-        mode = .bass
-    } else if args.contains("--snare-only") {
-        mode = .snare
+    func applicationDidFinishLaunching(_ aNotification: Notification) {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem.button {
+            button.image = NSImage(systemSymbolName: "waveform", accessibilityDescription: "Keyboard Strobe")
+        }
+        
+        let menu = NSMenu()
+        
+        startStopMenuItem = NSMenuItem(title: "Start Strobe", action: #selector(toggleStrobe), keyEquivalent: "s")
+        menu.addItem(startStopMenuItem)
+        menu.addItem(NSMenuItem.separator())
+        
+        let modeMenu = NSMenu()
+        modeMenu.addItem(NSMenuItem(title: "Dual (Bass + Snare)", action: #selector(setModeDual), keyEquivalent: ""))
+        modeMenu.addItem(NSMenuItem(title: "Bass Only", action: #selector(setModeBass), keyEquivalent: ""))
+        modeMenu.addItem(NSMenuItem(title: "Snare Only", action: #selector(setModeSnare), keyEquivalent: ""))
+        let modeItem = NSMenuItem(title: "Mode", action: nil, keyEquivalent: "")
+        modeItem.submenu = modeMenu
+        menu.addItem(modeItem)
+        
+        let delayMenu = NSMenu()
+        delayMenu.addItem(NSMenuItem(title: "0 ms", action: #selector(setDelay0), keyEquivalent: ""))
+        delayMenu.addItem(NSMenuItem(title: "80 ms", action: #selector(setDelay80), keyEquivalent: ""))
+        delayMenu.addItem(NSMenuItem(title: "120 ms (Default)", action: #selector(setDelay120), keyEquivalent: ""))
+        delayMenu.addItem(NSMenuItem(title: "150 ms", action: #selector(setDelay150), keyEquivalent: ""))
+        let delayItem = NSMenuItem(title: "Audio Delay", action: nil, keyEquivalent: "")
+        delayItem.submenu = delayMenu
+        menu.addItem(delayItem)
+        
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
+        
+        statusItem.menu = menu
     }
     
-    var delayMs: Double = 120.0
-    if let delayIndex = args.firstIndex(of: "--delay"), delayIndex + 1 < args.count {
-        if let customDelay = Double(args[delayIndex + 1]) {
-            delayMs = customDelay
+    @objc func toggleStrobe() {
+        if isRunning {
+            stopCapture()
+            startStopMenuItem.title = "Start Strobe"
+        } else {
+            startCapture()
+            startStopMenuItem.title = "Stop Strobe"
         }
     }
     
-    let path = "/System/Library/PrivateFrameworks/CoreBrightness.framework/CoreBrightness"
-    guard let handle = dlopen(path, RTLD_NOW) else {
-        print("Error: Failed to load CoreBrightness framework.")
-        return
-    }
-    defer { dlclose(handle) }
+    @objc func setModeDual() { currentMode = .dual; restartIfRunning() }
+    @objc func setModeBass() { currentMode = .bass; restartIfRunning() }
+    @objc func setModeSnare() { currentMode = .snare; restartIfRunning() }
     
-    guard let clientClass = NSClassFromString("KeyboardBrightnessClient") as? NSObject.Type else {
-        print("Error: Could not locate class 'KeyboardBrightnessClient'.")
-        return
-    }
+    @objc func setDelay0() { currentDelayMs = 0; restartIfRunning() }
+    @objc func setDelay80() { currentDelayMs = 80; restartIfRunning() }
+    @objc func setDelay120() { currentDelayMs = 120; restartIfRunning() }
+    @objc func setDelay150() { currentDelayMs = 150; restartIfRunning() }
     
-    let clientInstance = clientClass.init()
-    let client = clientInstance as AnyObject
-    
-    guard let ids = client.copyKeyboardBacklightIDs?(), ids.count > 0 else {
-        print("Error: No keyboard backlights detected.")
-        return
+    func restartIfRunning() {
+        if isRunning {
+            stopCapture()
+            startCapture()
+        }
     }
     
-    guard let keyboardID = (ids[0] as AnyObject).uint64Value else {
-        print("Error: Could not determine keyboard ID.")
-        return
+    func startCapture() {
+        _ = client.enableAutoBrightness?(false, forKeyboard: keyboardID)
+        
+        SCShareableContent.getWithCompletionHandler { [weak self] (content, error) in
+            guard let self = self, let content = content, let display = content.displays.first else { return }
+            
+            let filter = SCContentFilter(display: display, excludingApplications: [], exceptingWindows: [])
+            let config = SCStreamConfiguration()
+            config.capturesAudio = true
+            config.excludesCurrentProcessAudio = false
+            
+            let streamDelegate = StreamDelegate()
+            self.stream = SCStream(filter: filter, configuration: config, delegate: streamDelegate)
+            
+            self.processor = AudioProcessor(client: self.client, keyboardID: self.keyboardID, initialBrightness: self.initialBrightness, initialAutoBrightness: self.initialAutoBrightness, mode: self.currentMode, delayMs: self.currentDelayMs)
+            
+            try? self.stream?.addStreamOutput(self.processor!, type: .audio, sampleHandlerQueue: DispatchQueue.global(qos: .userInitiated))
+            
+            self.stream?.startCapture { error in
+                if error == nil {
+                    DispatchQueue.main.async {
+                        self.isRunning = true
+                    }
+                }
+            }
+        }
     }
     
-    let initialBrightness = client.brightnessForKeyboard?(keyboardID) ?? 0.5
-    let initialAutoBrightness = client.isAutoBrightnessEnabledForKeyboard?(keyboardID) ?? false
-    
-    _ = client.enableAutoBrightness?(false, forKeyboard: keyboardID)
-    
-    // Get shareable content for ScreenCaptureKit
-    let sema = DispatchSemaphore(value: 0)
-    var shareableContent: SCShareableContent?
-    var captureError: Error?
-    
-    SCShareableContent.getWithCompletionHandler { (content, error) in
-        shareableContent = content
-        captureError = error
-        sema.signal()
-    }
-    
-    _ = sema.wait(timeout: .now() + 5.0)
-    
-    if let error = captureError {
-        print("Error getting shareable content: \(error)")
+    func stopCapture() {
+        stream?.stopCapture { _ in }
+        stream = nil
+        processor = nil
+        isRunning = false
+        
+        _ = client.setBrightness?(initialBrightness, forKeyboard: keyboardID)
         _ = client.enableAutoBrightness?(initialAutoBrightness, forKeyboard: keyboardID)
-        return
     }
     
-    guard let content = shareableContent, let display = content.displays.first else {
-        print("Error: No displays found for screen capture.")
-        _ = client.enableAutoBrightness?(initialAutoBrightness, forKeyboard: keyboardID)
-        return
+    @objc func quitApp() {
+        if isRunning { stopCapture() }
+        NSApplication.shared.terminate(nil)
     }
     
-    let filter = SCContentFilter(display: display, excludingApplications: [], exceptingWindows: [])
-    let config = SCStreamConfiguration()
-    config.capturesAudio = true
-    config.excludesCurrentProcessAudio = false
-    
-    let streamDelegate = StreamDelegate()
-    let stream = SCStream(filter: filter, configuration: config, delegate: streamDelegate)
-    
-    let processor = AudioProcessor(client: client, keyboardID: keyboardID, initialBrightness: initialBrightness, initialAutoBrightness: initialAutoBrightness, mode: mode, delayMs: delayMs)
-    
-    do {
-        try stream.addStreamOutput(processor, type: .audio, sampleHandlerQueue: DispatchQueue.global(qos: .userInitiated))
-    } catch {
-        print("Error adding stream output: \(error)")
-        _ = client.enableAutoBrightness?(initialAutoBrightness, forKeyboard: keyboardID)
-        return
+    func applicationWillTerminate(_ aNotification: Notification) {
+        if isRunning { stopCapture() }
     }
-    
-    var startError: Error?
-    let startSema = DispatchSemaphore(value: 0)
-    
-    stream.startCapture { error in
-        startError = error
-        startSema.signal()
-    }
-    
-    _ = startSema.wait(timeout: .now() + 5.0)
-    
-    if let error = startError {
-        print("Error starting capture: \(error)")
-        _ = client.enableAutoBrightness?(initialAutoBrightness, forKeyboard: keyboardID)
-        return
-    }
-    
-    print("\n=== Keyboard Audio Visualizer (Disco Beat Sync) ===")
-    print("Status: Running.")
-    print("Source: Direct Internal macOS Audio Output (No mic).")
-    print("Detection: Dual-band (Kick LPF 120Hz + Snare HPF 1200Hz).")
-    print("Timing: Calibrated delay of \(Int(delayMs))ms (use --delay to adjust).")
-    print("To stop: Press Ctrl+C in this terminal window.")
-    print("====================================================\n")
-    
-    signal(SIGINT) { _ in
-        print("\nStopping visualizer...")
-        CFRunLoopStop(CFRunLoopGetMain())
-    }
-    
-    CFRunLoopRun()
-    
-    let stopSema = DispatchSemaphore(value: 0)
-    stream.stopCapture { _ in
-        stopSema.signal()
-    }
-    _ = stopSema.wait(timeout: .now() + 3.0)
-    
-    _ = client.setBrightness?(initialBrightness, forKeyboard: keyboardID)
-    _ = client.enableAutoBrightness?(initialAutoBrightness, forKeyboard: keyboardID)
-    print("Restored original keyboard brightness to \(initialBrightness * 100)%")
-    print("Restored original auto-brightness state to \(initialAutoBrightness)")
 }
 
-main()
+let app = NSApplication.shared
+let delegate = AppDelegate()
+app.delegate = delegate
+app.run()

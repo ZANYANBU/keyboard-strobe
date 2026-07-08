@@ -5,7 +5,13 @@
     <key>CFBundleIdentifier</key>
     <string>com.zanyanbu.keyboardstrobe</string>
     <key>CFBundleName</key>
-    <string>keyboard-strobe</string>
+    <string>Keyboard Strobe</string>
+    <key>CFBundleExecutable</key>
+    <string>KeyboardStrobe</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>LSUIElement</key>
+    <true/>
     <key>NSScreenCaptureUsageDescription</key>
     <string>This tool needs to capture system audio to synchronize your keyboard backlight brightness with your music.</string>
 </dict>

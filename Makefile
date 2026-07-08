@@ -1,25 +1,30 @@
 SWIFT_FILES = Sources/KeyboardStrobe/main.swift
-BINARY_NAME = keyboard-strobe
+APP_NAME = KeyboardStrobe
+BUNDLE_ID = com.zanyanbu.keyboardstrobe
+APP_DIR = $(APP_NAME).app
+MACOS_DIR = $(APP_DIR)/Contents/MacOS
+RESOURCES_DIR = $(APP_DIR)/Contents/Resources
+BINARY_NAME = $(MACOS_DIR)/$(APP_NAME)
 INFOPLIST = Info.plist
-INSTALL_DIR = /usr/local/bin
 
-all: $(BINARY_NAME)
+all: app
 
-$(BINARY_NAME): $(SWIFT_FILES) $(INFOPLIST)
+app: $(SWIFT_FILES) $(INFOPLIST)
+	@echo "Building $(APP_NAME).app..."
+	@mkdir -p $(MACOS_DIR)
+	@mkdir -p $(RESOURCES_DIR)
+	@cp $(INFOPLIST) $(APP_DIR)/Contents/Info.plist
 	swiftc -O -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker $(INFOPLIST) $(SWIFT_FILES) -o $(BINARY_NAME)
+	@echo "Build successful! You can now run $(APP_DIR)"
 
-install: $(BINARY_NAME)
-	@echo "Installing keyboard-strobe to $(INSTALL_DIR)..."
-	@mkdir -p $(INSTALL_DIR)
-	@cp $(BINARY_NAME) $(INSTALL_DIR)/$(BINARY_NAME)
-	@chmod +x $(INSTALL_DIR)/$(BINARY_NAME)
-	@echo "Installation successful! Run 'keyboard-strobe' in any terminal window."
-
-uninstall:
-	@rm -f $(INSTALL_DIR)/$(BINARY_NAME)
-	@echo "Uninstalled keyboard-strobe successfully."
+zip: app
+	@echo "Zipping $(APP_DIR) for release..."
+	@zip -r -X $(APP_NAME).zip $(APP_DIR)
+	@echo "Created $(APP_NAME).zip"
 
 clean:
-	rm -f $(BINARY_NAME)
+	@rm -rf $(APP_DIR)
+	@rm -f $(APP_NAME).zip
+	@rm -f keyboard-strobe
 
-.PHONY: all install uninstall clean
+.PHONY: all app zip clean
