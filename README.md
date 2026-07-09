@@ -10,6 +10,10 @@
 
 > **Note:** Just made this repo for fun! Love to connect! 🤝
 
+### 🎧 Great For:
+- **EDM & Bass Music:** Feel the physical impact of heavy kicks and drops.
+- **YouTube & Talk Shows:** Surprisingly enhances the viewing experience of regular everyday videos by adding a subtle, ambient reactive light to spoken transients and sound effects!
+
 ---
 
 ## 🎥 Demos
