@@ -6,7 +6,9 @@
 
 > **Turn your MacBook's keyboard backlight into a zero-latency, beat-synced strobe light!**
 
-`keyboard-strobe` is a high-performance command-line utility for macOS that captures direct system audio and flashes your MacBook keyboard's backlight in perfect sync with the beats of your music. It is built in native Swift and leverages Apple's **ScreenCaptureKit** to stream internal mixer audio directly—bypassing the microphone entirely and ignoring ambient room noise.
+`keyboard-strobe` is a high-performance macOS menubar utility that captures direct system audio and flashes your MacBook keyboard's backlight in perfect sync with the beats of your music. It is built in native Swift and leverages Apple's **ScreenCaptureKit** to stream internal mixer audio directly—bypassing the microphone entirely and ignoring ambient room noise.
+
+> **Note:** Just made this repo for fun! Love to connect! 🤝
 
 ---
 
@@ -36,10 +38,14 @@ https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo2.mp4
 ## 🚀 Installation
 
 ### 1. Download
-Download the latest `KeyboardStrobe.zip` from the repository.
+Download the latest `KeyboardStrobe.zip` from the [Releases](https://github.com/ZANYANBU/keyboard-strobe/releases) page.
 
 ### 2. Install
-Unzip the file and drag **KeyboardStrobe.app** to your `Applications` folder.
+1. Unzip the downloaded file.
+2. Drag **KeyboardStrobe.app** to your macOS `/Applications` folder.
+3. Open your Applications folder and double-click the app to launch it!
+
+*Tip: If you want it to launch automatically when you turn on your Mac, you can add it to **System Settings > General > Login Items**.*
 
 ---
 
@@ -62,12 +68,13 @@ Unzip the file and drag **KeyboardStrobe.app** to your `Applications` folder.
 ### 1. Screen & System Audio Recording Permission
 Because this tool taps into your Mac's internal audio mixer, macOS requires you to grant it **Screen & System Audio Recording** permissions.
 * The first time you run it, a system prompt will appear.
-* Go to **System Settings > Privacy & Security > Screen & System Audio Recording**, toggle **Terminal** (or your terminal application) to **ON**, and **restart** your terminal application.
+* Go to **System Settings > Privacy & Security > Screen & System Audio Recording**, and toggle **KeyboardStrobe** to **ON**.
 
-### 2. Ambient Light Sensor (Notch Override)
+### 2. Works Best in Low Light Environments (Hardware Limitation)
 macOS has a hardware-level battery-saving restriction: **If the room you are in is brightly lit, macOS physically cuts power to the keyboard backlight LEDs.**
-* If your room is too bright, your keyboard backlight will remain completely off even if the script is running successfully.
-* **To verify it works:** Test it in a dimly lit/dark room, or cover the camera/light sensor (next to the camera notch at the top center of your display) with a cloth or your hand.
+* **For the best experience, use this app in a low lighting environment or a dark room.**
+* If your room is too bright, your keyboard backlight will remain completely off even if the app is running successfully.
+* *Workaround:* If you want to use it in a bright room, cover the ambient light sensor (next to the camera notch at the top center of your display) with a piece of tape or cloth.
 
 ---
 
