@@ -53,13 +53,13 @@ Download the latest `KeyboardStrobe.zip` from the [Releases](https://github.com/
 
 ## 🛠️ Usage
 
-1. Double click **KeyboardStrobe.app** to launch it.
-2. A new waveform icon will appear in your macOS menu bar at the top right of your screen.
-3. Click the icon to open the dropdown menu, where you can:
+1. Double click the **KeyboardStrobe** app icon to open it.
+2. A new waveform icon will appear in your macOS menu bar at the top right of your screen. **Click this menubar icon for adjustments.**
+3. In the dropdown menu, you can dynamically switch:
    - **Start / Stop** the strobe visualizer.
-   - **Change Mode:** Select between Dual (default), Bass Only, or Snare Only.
-   - **Adjust Audio Delay:** Select an audio delay to compensate for Bluetooth speaker latency (default is 120ms).
-   - **Quit** the app cleanly.
+   - **Mode:** Select between Dual (default), Bass Only, or Snare Only.
+   - **Audio Delay:** Compensate for Bluetooth speaker latency (default is 120ms).
+   - **Max Brightness:** Limit the hardware brightness to 100%, 75%, or 50% to make the strobe flashes visually faster and snappier.
 
 ---
 
