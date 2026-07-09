@@ -55,6 +55,11 @@ Download the latest `KeyboardStrobe.zip` from the [Releases](https://github.com/
 2. Drag **KeyboardStrobe.app** to your macOS `/Applications` folder.
 3. Open your Applications folder and double-click the app to launch it!
 
+### 3. Optimal System Settings
+For the best visual experience, go to **System Settings > Keyboard** and apply these settings to prevent macOS from overriding the strobe effect:
+- **Adjust keyboard brightness in low light:** OFF
+- **Turn keyboard backlight off after inactivity:** Never
+
 *Tip: If you want it to launch automatically when you turn on your Mac, you can add it to **System Settings > General > Login Items**.*
 
 ---
