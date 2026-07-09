@@ -4,30 +4,29 @@
   <img src="demos/demo.gif" width="480" alt="Keyboard Strobe Demo">
 </div>
 
-*Watch with Audio:*
-https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/Demo.mp4
+<div align="center">
+  <i>Watch with Audio:</i><br>
+  <a href="https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/Demo.mp4"><b>Demo.mp4</b></a>
+</div>
 
 > **Turn your MacBook's keyboard backlight into a zero-latency, beat-synced strobe light!**
 
-`keyboard-strobe` is a high-performance macOS menubar utility that captures direct system audio and flashes your MacBook keyboard's backlight in perfect sync with the beats of your music. It is built in native Swift and leverages Apple's **ScreenCaptureKit** to stream internal mixer audio directly—bypassing the microphone entirely and ignoring ambient room noise.
+---
 
-> **Note:** Just made this repo for fun! Love to connect! 🤝
+## 📖 About
+
+`keyboard-strobe` is a high-performance macOS menubar utility that captures direct system audio and flashes your MacBook keyboard's backlight in perfect sync with the beats of your music. Built natively in Swift, it leverages Apple's **ScreenCaptureKit** to stream internal mixer audio directly—bypassing the microphone entirely and ignoring ambient room noise.
+
+### 🤔 The "Wait, a MacBook can do that?" Factor
+While PC users with Razer or Corsair keyboards have had music-reactive RGB lighting for a decade, Apple has always kept their hardware tightly locked down. There is practically zero native support for this kind of hardware customization on macOS.
+
+This app exists to fill that totally unoccupied niche. It leverages undocumented, private Apple APIs (`CoreBrightness`) to commandeer the physical LEDs in the MacBook's keyboard. The result? A completely standard, un-modded MacBook doing a lightning-fast music strobe sync in a pitch-black room with zero latency and no external microphone required. People love discovering hidden capabilities in hardware they already own. This project unlocks one of them!
 
 ### 🎧 Great For:
 - **EDM & Bass Music:** Feel the physical impact of heavy kicks and drops.
 - **YouTube & Talk Shows:** Surprisingly enhances the viewing experience of regular everyday videos by adding a subtle, ambient reactive light to spoken transients and sound effects!
 
----
-
-## 🎥 Demos
-
-*Click to play the demo clips below:*
-
-https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/Demo.mp4
-
-https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo1.mp4
-
-https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo2.mp4
+*(Note: Just made this repo for fun! Love to connect! 🤝)*
 
 ---
 
@@ -44,17 +43,17 @@ https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo2.mp4
 
 ---
 
-## 🤔 The "Wait, a MacBook can do that?" Factor
+## 🎥 Demos
 
-While PC users with Razer or Corsair keyboards have had music-reactive RGB lighting for a decade, Apple has always kept their hardware tightly locked down. There is practically zero native support for this kind of hardware customization on macOS.
+*Click to play the demo clips below:*
 
-This app exists to fill that totally unoccupied niche. It leverages undocumented, private Apple APIs (`CoreBrightness`) to commandeer the physical LEDs in the MacBook's keyboard. The result? A completely standard, un-modded MacBook doing a lightning-fast music strobe sync in a pitch-black room with zero latency and no external microphone required. 
+https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo1.mp4
 
-People love discovering hidden capabilities in hardware they already own. This project unlocks one of them!
+https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo2.mp4
 
 ---
 
-## 🚀 Installation
+## 🚀 Installation & Setup
 
 ### 1. Download
 Download the latest `KeyboardStrobe.zip` from the [Releases](https://github.com/ZANYANBU/keyboard-strobe/releases) page.
@@ -64,14 +63,12 @@ Download the latest `KeyboardStrobe.zip` from the [Releases](https://github.com/
 2. Drag **KeyboardStrobe.app** to your macOS `/Applications` folder.
 3. Open your Applications folder and double-click the app to launch it!
 
+*Tip: If you want it to launch automatically when you turn on your Mac, you can add it to **System Settings > General > Login Items**.*
+
 ### 3. Optimal System Settings
 For the best visual experience, go to **System Settings > Keyboard** and apply these settings to prevent macOS from overriding the strobe effect:
 - **Adjust keyboard brightness in low light:** OFF
 - **Turn keyboard backlight off after inactivity:** Never
-
-*Tip: If you want it to launch automatically when you turn on your Mac, you can add it to **System Settings > General > Login Items**.*
-
----
 
 ---
 
