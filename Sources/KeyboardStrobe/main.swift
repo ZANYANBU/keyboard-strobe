@@ -47,17 +47,17 @@ class AudioProcessor: NSObject, SCStreamOutput {
         let turnOffTime: Date
     }
     var beatQueue = [BeatEvent]()
-    let delayDuration: TimeInterval // Configurable delay in seconds
+    var delayDuration: TimeInterval // Configurable delay in seconds
     
     // Mode settings
-    let mode: VisualizerMode
+    var mode: VisualizerMode
     
     enum VisualizerMode {
         case dual  // Flash on both Bass (kicks) and Treble (snares/claps)
         case bass  // Flash only on Bass kicks
         case snare // Flash only on Snare hits/claps
     }
-    let maxBrightness: Float
+    var maxBrightness: Float
     
     init(client: AnyObject, keyboardID: UInt64, initialBrightness: Float, initialAutoBrightness: Bool, mode: VisualizerMode, delayMs: Double, maxBrightness: Float = 1.0) {
         self.client = client
@@ -164,7 +164,7 @@ class AudioProcessor: NSObject, SCStreamOutput {
     }
 }
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
     var statusItem: NSStatusItem!
     
     // Audio engine components
@@ -262,26 +262,42 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    @objc func setModeDual() { currentMode = .dual; restartIfRunning() }
-    @objc func setModeBass() { currentMode = .bass; restartIfRunning() }
-    @objc func setModeSnare() { currentMode = .snare; restartIfRunning() }
+    @objc func setModeDual() { currentMode = .dual; updateProcessor() }
+    @objc func setModeBass() { currentMode = .bass; updateProcessor() }
+    @objc func setModeSnare() { currentMode = .snare; updateProcessor() }
     
-    @objc func setDelay0() { currentDelayMs = 0; restartIfRunning() }
-    @objc func setDelay80() { currentDelayMs = 80; restartIfRunning() }
-    @objc func setDelay120() { currentDelayMs = 120; restartIfRunning() }
-    @objc func setDelay150() { currentDelayMs = 150; restartIfRunning() }
+    @objc func setDelay0() { currentDelayMs = 0; updateProcessor() }
+    @objc func setDelay80() { currentDelayMs = 80; updateProcessor() }
+    @objc func setDelay120() { currentDelayMs = 120; updateProcessor() }
+    @objc func setDelay150() { currentDelayMs = 150; updateProcessor() }
     
-    @objc func setBrightness100() { currentMaxBrightness = 1.0; restartIfRunning() }
-    @objc func setBrightness75() { currentMaxBrightness = 0.2; restartIfRunning() }
-    @objc func setBrightness50() { currentMaxBrightness = 0.05; restartIfRunning() }
+    @objc func setBrightness100() { currentMaxBrightness = 1.0; updateProcessor() }
+    @objc func setBrightness75() { currentMaxBrightness = 0.2; updateProcessor() }
+    @objc func setBrightness50() { currentMaxBrightness = 0.05; updateProcessor() }
     
-    func restartIfRunning() {
-        if isRunning {
-            stopCapture()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.startCapture()
-            }
+    func updateProcessor() {
+        if let proc = processor {
+            proc.mode = currentMode
+            proc.delayDuration = currentDelayMs / 1000.0
+            proc.maxBrightness = currentMaxBrightness
         }
+    }
+    
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(setModeDual) { menuItem.state = (currentMode == .dual) ? .on : .off }
+        else if menuItem.action == #selector(setModeBass) { menuItem.state = (currentMode == .bass) ? .on : .off }
+        else if menuItem.action == #selector(setModeSnare) { menuItem.state = (currentMode == .snare) ? .on : .off }
+        
+        else if menuItem.action == #selector(setDelay0) { menuItem.state = (currentDelayMs == 0) ? .on : .off }
+        else if menuItem.action == #selector(setDelay80) { menuItem.state = (currentDelayMs == 80) ? .on : .off }
+        else if menuItem.action == #selector(setDelay120) { menuItem.state = (currentDelayMs == 120) ? .on : .off }
+        else if menuItem.action == #selector(setDelay150) { menuItem.state = (currentDelayMs == 150) ? .on : .off }
+        
+        else if menuItem.action == #selector(setBrightness100) { menuItem.state = (currentMaxBrightness == 1.0) ? .on : .off }
+        else if menuItem.action == #selector(setBrightness75) { menuItem.state = (currentMaxBrightness == 0.2) ? .on : .off }
+        else if menuItem.action == #selector(setBrightness50) { menuItem.state = (currentMaxBrightness == 0.05) ? .on : .off }
+        
+        return true
     }
     
     func startCapture() {
