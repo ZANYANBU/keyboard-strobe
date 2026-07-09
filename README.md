@@ -35,6 +35,16 @@ https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo2.mp4
 
 ---
 
+## 🤔 The "Wait, a MacBook can do that?" Factor
+
+While PC users with Razer or Corsair keyboards have had music-reactive RGB lighting for a decade, Apple has always kept their hardware tightly locked down. There is practically zero native support for this kind of hardware customization on macOS.
+
+This app exists to fill that totally unoccupied niche. It leverages undocumented, private Apple APIs (`CoreBrightness`) to commandeer the physical LEDs in the MacBook's keyboard. The result? A completely standard, un-modded MacBook doing a lightning-fast music strobe sync in a pitch-black room with zero latency and no external microphone required. 
+
+People love discovering hidden capabilities in hardware they already own. This project unlocks one of them!
+
+---
+
 ## 🚀 Installation
 
 ### 1. Download
