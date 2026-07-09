@@ -1,8 +1,6 @@
 # 🎹 Keyboard Strobe
 
-<div align="center">
-  <img src="demos/demo.gif" width="320" alt="Keyboard Strobe Demo">
-</div>
+https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/Demo.mp4
 
 > **Turn your MacBook's keyboard backlight into a zero-latency, beat-synced strobe light!**
 
