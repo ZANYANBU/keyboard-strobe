@@ -272,13 +272,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func setDelay150() { currentDelayMs = 150; restartIfRunning() }
     
     @objc func setBrightness100() { currentMaxBrightness = 1.0; restartIfRunning() }
-    @objc func setBrightness75() { currentMaxBrightness = 0.75; restartIfRunning() }
-    @objc func setBrightness50() { currentMaxBrightness = 0.5; restartIfRunning() }
+    @objc func setBrightness75() { currentMaxBrightness = 0.2; restartIfRunning() }
+    @objc func setBrightness50() { currentMaxBrightness = 0.05; restartIfRunning() }
     
     func restartIfRunning() {
         if isRunning {
             stopCapture()
-            startCapture()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.startCapture()
+            }
         }
     }
     
