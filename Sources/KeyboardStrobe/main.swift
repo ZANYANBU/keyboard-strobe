@@ -57,14 +57,16 @@ class AudioProcessor: NSObject, SCStreamOutput {
         case bass  // Flash only on Bass kicks
         case snare // Flash only on Snare hits/claps
     }
+    let maxBrightness: Float
     
-    init(client: AnyObject, keyboardID: UInt64, initialBrightness: Float, initialAutoBrightness: Bool, mode: VisualizerMode, delayMs: Double) {
+    init(client: AnyObject, keyboardID: UInt64, initialBrightness: Float, initialAutoBrightness: Bool, mode: VisualizerMode, delayMs: Double, maxBrightness: Float = 1.0) {
         self.client = client
         self.keyboardID = keyboardID
         self.initialBrightness = initialBrightness
         self.initialAutoBrightness = initialAutoBrightness
         self.mode = mode
         self.delayDuration = delayMs / 1000.0
+        self.maxBrightness = maxBrightness
         super.init()
     }
     
@@ -155,7 +157,7 @@ class AudioProcessor: NSObject, SCStreamOutput {
             // Check if we are currently inside any active beat's trigger window
             let isLightOn = beatQueue.contains(where: { now >= $0.triggerTime && now <= $0.turnOffTime })
             
-            let targetBrightness: Float = isLightOn ? 1.0 : 0.0
+            let targetBrightness: Float = isLightOn ? maxBrightness : 0.0
             _ = client.setBrightness?(targetBrightness, forKeyboard: keyboardID)
             
         }
@@ -176,6 +178,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // State
     var currentMode: AudioProcessor.VisualizerMode = .dual
     var currentDelayMs: Double = 120.0
+    var currentMaxBrightness: Float = 1.0
     var isRunning = false
     
     // UI elements to update state
@@ -235,6 +238,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         delayItem.submenu = delayMenu
         menu.addItem(delayItem)
         
+        let brightnessMenu = NSMenu()
+        brightnessMenu.addItem(NSMenuItem(title: "100% (Maximum Contrast)", action: #selector(setBrightness100), keyEquivalent: ""))
+        brightnessMenu.addItem(NSMenuItem(title: "75% (Faster Fade)", action: #selector(setBrightness75), keyEquivalent: ""))
+        brightnessMenu.addItem(NSMenuItem(title: "50% (Fastest/Snappiest Fade)", action: #selector(setBrightness50), keyEquivalent: ""))
+        let brightnessItem = NSMenuItem(title: "Max Brightness", action: nil, keyEquivalent: "")
+        brightnessItem.submenu = brightnessMenu
+        menu.addItem(brightnessItem)
+        
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
         
@@ -260,6 +271,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc func setDelay120() { currentDelayMs = 120; restartIfRunning() }
     @objc func setDelay150() { currentDelayMs = 150; restartIfRunning() }
     
+    @objc func setBrightness100() { currentMaxBrightness = 1.0; restartIfRunning() }
+    @objc func setBrightness75() { currentMaxBrightness = 0.75; restartIfRunning() }
+    @objc func setBrightness50() { currentMaxBrightness = 0.5; restartIfRunning() }
+    
     func restartIfRunning() {
         if isRunning {
             stopCapture()
@@ -281,7 +296,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let streamDelegate = StreamDelegate()
             self.stream = SCStream(filter: filter, configuration: config, delegate: streamDelegate)
             
-            self.processor = AudioProcessor(client: self.client, keyboardID: self.keyboardID, initialBrightness: self.initialBrightness, initialAutoBrightness: self.initialAutoBrightness, mode: self.currentMode, delayMs: self.currentDelayMs)
+            self.processor = AudioProcessor(client: self.client, keyboardID: self.keyboardID, initialBrightness: self.initialBrightness, initialAutoBrightness: self.initialAutoBrightness, mode: self.currentMode, delayMs: self.currentDelayMs, maxBrightness: self.currentMaxBrightness)
             
             try? self.stream?.addStreamOutput(self.processor!, type: .audio, sampleHandlerQueue: DispatchQueue.global(qos: .userInitiated))
             
