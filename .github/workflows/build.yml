@@ -1,0 +1,20 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: Build the app
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build KeyboardStrobe.app
+        run: make app
+      - name: Check the bundle
+        run: |
+          test -x KeyboardStrobe.app/Contents/MacOS/KeyboardStrobe
+          plutil -lint KeyboardStrobe.app/Contents/Info.plist
+          codesign --verify --deep --strict KeyboardStrobe.app
+          vtool -show-build KeyboardStrobe.app/Contents/MacOS/KeyboardStrobe | grep -q "minos 13.0"

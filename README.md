@@ -1,5 +1,9 @@
 # 🎹 Keyboard Strobe
 
+[![Build](https://github.com/ZANYANBU/keyboard-strobe/actions/workflows/build.yml/badge.svg)](https://github.com/ZANYANBU/keyboard-strobe/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/v/release/ZANYANBU/keyboard-strobe?color=2ea44f)](https://github.com/ZANYANBU/keyboard-strobe/releases/latest)
+[![MIT licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
+
 <div align="center">
   <img src="demos/demo.gif" width="480" alt="Keyboard Strobe Demo">
 </div>
