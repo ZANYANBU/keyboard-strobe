@@ -15,12 +15,13 @@ app: $(SWIFT_FILES) $(INFOPLIST)
 	@mkdir -p $(RESOURCES_DIR)
 	@cp $(INFOPLIST) $(APP_DIR)/Contents/Info.plist
 	@cp AppIcon.icns $(RESOURCES_DIR)/AppIcon.icns
-	swiftc -O -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker $(INFOPLIST) $(SWIFT_FILES) -o $(BINARY_NAME)
+	swiftc -O -target arm64-apple-macos13.0 -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker $(INFOPLIST) $(SWIFT_FILES) -o $(BINARY_NAME)
+	@codesign --force --deep --sign - $(APP_DIR)
 	@echo "Build successful! You can now run $(APP_DIR)"
 
 zip: app
 	@echo "Zipping $(APP_DIR) for release..."
-	@zip -r -X $(APP_NAME).zip $(APP_DIR)
+	@ditto -c -k --keepParent $(APP_DIR) $(APP_NAME).zip
 	@echo "Created $(APP_NAME).zip"
 
 clean:

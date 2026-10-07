@@ -56,12 +56,16 @@ https://github.com/ZANYANBU/keyboard-strobe/raw/main/demos/demo2.mp4
 ## 🚀 Installation & Setup
 
 ### 1. Download
-Download the latest `KeyboardStrobe.zip` from the [Releases](https://github.com/ZANYANBU/keyboard-strobe/releases) page.
+Download **[KeyboardStrobe.zip](https://github.com/ZANYANBU/keyboard-strobe/releases/latest/download/KeyboardStrobe.zip)** (Apple Silicon MacBook, macOS 13 or later).
 
 ### 2. Install
 1. Unzip the downloaded file.
 2. Drag **KeyboardStrobe.app** to your macOS `/Applications` folder.
 3. Open your Applications folder and double-click the app to launch it!
+
+> **First launch:** the app is not notarised by Apple, so macOS blocks it once. Open
+> **System Settings → Privacy & Security**, scroll down and click **Open Anyway**,
+> or run `xattr -dr com.apple.quarantine /Applications/KeyboardStrobe.app`.
 
 *Tip: If you want it to launch automatically when you turn on your Mac, you can add it to **System Settings > General > Login Items**.*
 
