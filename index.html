@@ -65,7 +65,7 @@
     <main id="top">
       <div class="hero">
         <h1>Your keyboard,<br><span>in time with the music.</span></h1>
-        <p class="lede">A menu-bar app that flashes a MacBook's keyboard backlight to whatever is playing.</p>
+        <p class="lede">A menu-bar app that flashes a MacBook's keyboard backlight to whatever is playing, as you type, and when a notification arrives.</p>
         <div class="actions">
           <a class="btn primary" href="https://github.com/ZANYANBU/keyboard-strobe/releases/latest/download/KeyboardStrobe.zip">Download for Mac</a>
           <a class="btn" href="https://github.com/ZANYANBU/keyboard-strobe">View the source</a>
@@ -86,6 +86,8 @@
           <li><strong>Three modes</strong><span>Follow both kick and snare, bass only, or snare only.</span></li>
           <li><strong>Bluetooth delay</strong><span>Shift the lights to match speakers that lag behind. The default is 120 ms.</span></li>
           <li><strong>Brightness limit</strong><span>Cap it at 100%, 75% or 50%. Lower makes the flashes feel snappier.</span></li>
+          <li><strong>Typing Pulse</strong><span>The keyboard stays dark and lights up as you type, then fades out when you stop.</span></li>
+          <li><strong>Notification Flash</strong><span>Three blinks when a notification banner appears.</span></li>
           <li><strong>Start and stop</strong><span>Everything lives in one menu-bar icon.</span></li>
           <li><strong>Cleans up after itself</strong><span>It takes over the backlight while running and hands it back when you quit.</span></li>
           <li><strong>Open source</strong><span>One Swift file. Read exactly what it does.</span></li>
@@ -99,6 +101,7 @@
             <li><a href="https://github.com/ZANYANBU/keyboard-strobe/releases/latest/download/KeyboardStrobe.zip">Download KeyboardStrobe.zip</a>, unzip it and drag the app to Applications.</li>
             <li>The first time, macOS blocks it because the app is not notarised by Apple. Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>.</li>
             <li>Allow <strong>Screen &amp; System Audio Recording</strong> for Keyboard Strobe when macOS asks. It needs that to hear what is playing.</li>
+            <li>For Typing Pulse, allow <strong>Input Monitoring</strong> as well. The app learns only that a key was pressed, never which key.</li>
           </ol>
           <p class="fine">It works best in a dim room: macOS switches the keyboard backlight off in bright light. In System Settings → Keyboard, turn off "Adjust keyboard brightness in low light" and set the backlight to never turn off.</p>
         </div>
