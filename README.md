@@ -4,6 +4,8 @@
 [![Latest release](https://img.shields.io/github/v/release/ZANYANBU/keyboard-strobe?color=2ea44f)](https://github.com/ZANYANBU/keyboard-strobe/releases/latest)
 [![MIT licence](https://img.shields.io/badge/licence-MIT-blue)](LICENSE)
 
+**[Website](https://zanyanbu.github.io/keyboard-strobe/)** · **[Download for Mac](https://github.com/ZANYANBU/keyboard-strobe/releases/latest/download/KeyboardStrobe.zip)**
+
 <div align="center">
   <img src="demos/demo.gif" width="480" alt="Keyboard Strobe Demo">
 </div>
