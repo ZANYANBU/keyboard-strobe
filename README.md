@@ -45,6 +45,8 @@ This app exists to fill that totally unoccupied niche. It leverages undocumented
 - **🎛️ Onset Detection Algorithm:** Maintains a sliding average history to trigger flashes strictly on major musical peaks, ignoring minor background melodies and static.
 - **🚥 Hardware LED Protection:** Embeds a sustain/decay timing envelope ($60\text{ms}$ ON / $20\text{ms}$ OFF minimum hold-gates) to accommodate the MacBook's physical LED fade limits, producing crisp, high-speed strobe transitions.
 - **🤫 Dynamic Auto-Calibration:** Automatically calibrates sensitivity to the current audio output volume so beats pop just as clearly on quiet acoustic tracks as they do on loud club music.
+- **⌨️ Typing Pulse:** The keyboard stays dark and lights up with every key you press.
+- **🔔 Notification Flash:** The keyboard blinks three times when a notification banner appears.
 - **🔒 Dynamic Auto-Brightness Override:** Automatically disables macOS's ambient light sensor control when active and restores it cleanly on exit.
 
 ---
