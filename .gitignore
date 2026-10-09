@@ -8,3 +8,7 @@ DerivedData/
 
 # OS Files
 .DS_Store
+
+# Build output
+KeyboardStrobe.app/
+KeyboardStrobe.zip
