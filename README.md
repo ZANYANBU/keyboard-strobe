@@ -91,6 +91,12 @@ For the best visual experience, go to **System Settings > Keyboard** and apply t
    - **Mode:** Select between Dual (default), Bass Only, or Snare Only.
    - **Audio Delay:** Compensate for Bluetooth speaker latency (default is 120ms).
    - **Max Brightness:** Limit the hardware brightness to 100%, 75%, or 50% to make the strobe flashes visually faster and snappier.
+   - **Typing Pulse:** The keyboard stays dark and lights up as you type, then fades out when you stop.
+   - **Notification Flash:** The keyboard blinks three times when a notification banner appears.
+
+Typing Pulse and Notification Flash work on their own or together with the strobe, and are remembered the next time you open the app.
+
+A MacBook's backlight is one light behind the whole keyboard, so the keys light up together. Lighting a single key is not possible on this hardware.
 
 ---
 
@@ -101,7 +107,17 @@ Because this tool taps into your Mac's internal audio mixer, macOS requires you 
 * The first time you run it, a system prompt will appear.
 * Go to **System Settings > Privacy & Security > Screen & System Audio Recording**, and toggle **KeyboardStrobe** to **ON**.
 
-### 2. Works Best in Low Light Environments (Hardware Limitation)
+### 2. Input Monitoring Permission (Typing Pulse only)
+Typing Pulse needs to know *when* a key is pressed, so macOS asks for **Input Monitoring**.
+* Go to **System Settings > Privacy & Security > Input Monitoring**, toggle **KeyboardStrobe** to **ON**, then choose **Typing Pulse** again.
+* The app only counts key presses. It never reads which key was pressed and stores nothing.
+
+### 3. What Notification Flash Can and Cannot See
+macOS does not tell apps about other apps' notifications, so Keyboard Strobe watches for the notification banner coming on screen. This needs no extra permission, with two limits:
+* A notification that shows no banner is missed: a Focus mode is on, or banners are switched off for that app.
+* Opening Notification Centre yourself also triggers a blink.
+
+### 4. Works Best in Low Light Environments (Hardware Limitation)
 macOS has a hardware-level battery-saving restriction: **If the room you are in is brightly lit, macOS physically cuts power to the keyboard backlight LEDs.**
 * **For the best experience, use this app in a low lighting environment or a dark room.**
 * If your room is too bright, your keyboard backlight will remain completely off even if the app is running successfully.
